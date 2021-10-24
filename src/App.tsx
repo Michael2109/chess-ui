@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import {Button} from "react-bootstrap";
 import SockJS from "sockjs-client";
-import { Stomp } from '@stomp/stompjs';
+import {IMessage, Stomp} from '@stomp/stompjs';
 
 function App(): JSX.Element {
   return (
@@ -37,12 +37,19 @@ function connect(){
   stompClient.connect({}, function (frame: unknown) {
 
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/topic/greetings', function (greeting) {
-      console.log("Successfully subscribed")
-      console.log(greeting.body)
+
+    stompClient.subscribe('/topic/movePiece', (chessBoard: IMessage) => {
+      console.log(chessBoard.body)
     });
 
-    stompClient.send("/app/hello", {}, JSON.stringify({'name': "Michael"}));
+
+    stompClient.subscribe('/topic/validMoves', (chessBoard: IMessage) => {
+      console.log(chessBoard.body)
+    });
+
+   // stompClient.send("/app/hello", {}, JSON.stringify({'name': "Michael"}));
+    stompClient.send("/app/movePiece", {}, JSON.stringify({'source': {x: 1,  y: 2}, 'target': {x: 3,  y: 4}}));
+    stompClient.send("/app/validMoves", {}, JSON.stringify({x: 1,  y: 2}));
   });
 }
 
